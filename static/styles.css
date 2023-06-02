@@ -1,7 +1,41 @@
 .spinner{
   font-size: 140px;
 }
+@keyframes spinner {
+  0% {
+    transform: translate3d(0%, 35%, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(0%, 35%, 0) rotate(360deg);
+  }
+}
+.remove-spinner:after {
+  content: '' !important;
+}
+.error-message {
+  color: red;
+}
+.msft-stock{
+  color:gold;
+}
+.aapl-stock{
+  color: teal;
+}
+.fb-stock{
+  color: blue;
+}
+.ea-stock{
+  color: violet;
+}
+.ibm-stock{
+  color:lightgreen;
+}
+
 .spinner:after {
+  animation: 1.5s linear infinite spinner;
+  animation-play-state: inherit;
+  transform-origin: 50% 64%;
+  display: inline-block;
   content: '◌';
 }
 
