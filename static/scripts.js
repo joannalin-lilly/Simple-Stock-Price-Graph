@@ -1,5 +1,6 @@
 const canvas = document.getElementById('chart');
 const ctx = canvas.getContext('2d');
+const errorMessage = 'One or more stocks failed to generate stock data';
 
 function drawLine(start, end, style) {
   ctx.beginPath();
@@ -67,44 +68,43 @@ function fetchIndividualStock(symbol) {
       return response.json();
     })
     .then(response => {
-      return response;
-    })
-    .catch(error => {
-      console.log(error);
-      return error.message;
-    })
-    .then(result => {
       fetchedStocks++;
       const spinnerElement = document.getElementById('spinner');
       const errorMessageElement = document.getElementById('error-message');
       if (spinnerElement != null && !spinnerElement.classList.contains('remove-spinner')) {
         spinnerElement.classList.add('remove-spinner');
       }
-      if (typeof result === 'string' && result.indexOf('Failed to fetch') > -1) {
-        errorMessageElement.innerHTML = 'One or more stocks failed to generate stock data';
+      if (response.error) {
+        errorMessageElement.innerHTML += `<li>${response.error}: ${symbol}</li>`;
         return;
+      } else {
+        let prevX = 50;
+        let prevY = 0;
+        let x = 0;
+        let y = 0;
+        loggedData.push({ [symbol]: response });
+        response.forEach((entry, index) => {
+          const value = entry.value;
+          const timestamp = entry.timestamp;
+          x = prevX + 90;
+          y = 550 - 200 - value;
+          let color = '';
+          color = getStockColor(symbol);
+          if (index !== 0) {
+            drawLine([prevX, prevY], [x, y], color);
+          }
+          prevX = x;
+          prevY = y;
+        });
       }
-      let prevX = 50;
-      let prevY = 0;
-      let x = 0;
-      let y = 0;
-      loggedData.push({ [symbol]: result });
       if (fetchedStocks === totalStocks) {
         console.log(loggedData);
       }
-      result.forEach((entry, index) => {
-        const value = entry.value;
-        const timestamp = entry.timestamp;
-        x = prevX + 90;
-        y = 550 - 200 - value;
-        let color = '';
-        color = getStockColor(symbol);
-        if (index !== 0) {
-          drawLine([prevX, prevY], [x, y], color);
-        }
-        prevX = x;
-        prevY = y;
-      });
-    });
+    })
+    .catch(error => {
+      console.log(error);
+      return error;
+    })
+
 }
 
